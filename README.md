@@ -58,6 +58,23 @@ Quick start
 
    Dependencies: pytest, ete3, fastjsonschema, requests
 
+Repository layout
+-----------------
+
+Each Nextflow process lives in its own file under `modules/`, split by the pipeline that uses it:
+
+```
+modules/
+├── bacteria/   # processes used only by nf_bacterial_phylogenetic_pipeline.nf
+├── viruses/    # processes used only by nf_viral_phylogenetic_pipeline.nf
+└── common/     # processes shared by both pipelines
+```
+
+Several process names exist in both `bacteria/` and `viruses/` (e.g. `augur_filter_sequences`,
+`metadata_for_microreact`). These are genuinely different implementations - the bacterial pipeline
+works on a single core-genome alignment while the viral one works per segment - so they are kept
+apart on purpose and must not be merged.
+
 Related projects
 ----------------
 
@@ -166,9 +183,18 @@ Depending on the configured safeguard level, the pipeline will not execute if:
 - More than one unique **`virus`** is present in the `virus` column.
 - More than one unique **`type`** is present in the `type` column (**default safeguard**).
 - The column selected by `--map_detail` (`city` by default, or `country`) contains empty values. Empty join keys duplicate rows when metadata is merged with coordinates.
-- The `date` column contains a value that is not `YYYY-MM-DD`, or every sample shares the exact same date and `--clockrate` was not provided. TimeTree cannot estimate a clock rate without variation in sampling dates; either add samples from another date or pass `--clockrate` explicitly.
+- The `date` column contains a value that is not `YYYY-MM-DD`.
 
 - This prevents accidental mixing of heterogeneous datasets (e.g., different viruses, types, or geographic origins) in a single phylogenetic analysis run.
+
+### Samples sharing a single sampling date
+
+If every sample has the same `date` and `--clockrate` was not provided, the run is **not** rejected.
+TimeTree cannot estimate a clock rate without variation in sampling dates, so the wrapper prints a
+warning and instructs the pipeline to skip the estimation step and use the built-in clock rate for
+the analysed organism (`sars-cov-2`: `1.12e-3`, `influenza`: `2e-5`, `rsv`: `1.12e-3`).
+In that case `clockrate_correlation` in the output JSON is reported as `-1`, exactly as when the rate
+is supplied with `--clockrate`. Pass `--clockrate` to use a different value.
 ---
 
 -----------------------------------------------------------------
@@ -253,9 +279,22 @@ The pipeline includes strict safeguards to ensure homogeneity of input data. The
 
 - Different **serotypes** (`Serovar` column in the metadata file) are provided together.
 - The column selected by `--map_detail` (`city` by default, or `country`) is missing or contains empty values. Empty join keys duplicate rows when metadata is merged with coordinates.
-- The `date` column contains a value that is not `YYYY-MM-DD`, or every sample shares the exact same date and `--clockrate` was not provided. TimeTree cannot estimate a clock rate without variation in sampling dates; either add samples from another date or pass `--clockrate` explicitly.
+- The `date` column contains a value that is not `YYYY-MM-DD`.
 
 All columns in metadata file are shipped to microreact project and shown in a default view.
+
+### Samples sharing a single sampling date
+
+If every sample has the same `date` and `--clockrate` was not provided, the run is **not** rejected.
+TimeTree cannot estimate a clock rate without variation in sampling dates, so the wrapper prints a
+warning and instructs the pipeline to skip the estimation step and use the built-in clock rate for
+the analysed genus (`Salmonella`: `2e-6`, `Escherichia`: `8e-9`, `Campylobacter`: `6e-6`).
+In that case `clockrate_correlation` in the output JSON is reported as `-1`, exactly as when the rate
+is supplied with `--clockrate`. Pass `--clockrate` to use a different value.
+
+`run_example_salmonella_same_date.sh` and `run_example_influenza_same_date.sh` exercise this path
+using the regular example FASTA files with an alternative metadata file
+(`metadata_salmonella_same_date.txt` / `influenza_metadata_same_date.tsv`).
 ---
 
 ## Input File Naming
