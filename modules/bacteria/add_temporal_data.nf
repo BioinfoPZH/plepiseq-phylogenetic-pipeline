@@ -49,6 +49,11 @@ process add_temporal_data {
        esac
     }
 
+    # Stays empty as long as the clock rate comes from the data or from the user. Anything else
+    # means we silently substituted a built-in value, which the JSON must say out loud.
+    # Keep the text free of quotes and apostrophes, the JSON below is assembled with tr.
+    CLOCKRATE_WARNING=""
+
     if [ -n "${params.clockrate}"  ]; then
        # use user provided parameters for treetime overwrites all safeguards
        run_augur ${params.clockrate}
@@ -64,11 +69,19 @@ process add_temporal_data {
 
        CORRELATION="-1"
        CLOCK=\${clockrate}
+       CLOCKRATE_WARNING="All samples share a single sampling date, so the clock rate could not be estimated. The built-in rate for ${params.genus} (\${clockrate}) was used instead."
     else
      
       # Estimate clock rate if correlation is poor use predefined values for a provided genus ... better than nothing i guess
       cat $metadata | tr "\\t" "," >> metadata.csv
-      /usr/local/bin/treetime clock --tree $tree --aln $alignment --dates metadata.csv >> log 2>&1
+
+      # treetime gives up on data without a usable temporal signal, and it does so by raising
+      # (e.g. "LinAlgError: Singular matrix" from the root-to-tip regression when the samples are
+      # nearly identical). The task runs under "bash -ue", so its exit status must be caught here
+      # or it terminates the whole process before the fallback below is reached.
+      TREETIME_STATUS=0
+      /usr/local/bin/treetime clock --tree $tree --aln $alignment --dates metadata.csv >> log 2>&1 || TREETIME_STATUS=\$?
+
       CORRELATION=`cat log  | grep "r^2" | awk '{print \$2}'`
       CLOCK=`cat log  | grep -w "\\-\\-rate"  | awk '{print \$2}'`
 
@@ -78,10 +91,17 @@ process add_temporal_data {
         CORRELATION="-1"
       fi
 
-      if awk "BEGIN {if (\${CORRELATION} < 0.5) exit 0; else exit 1}"; then
+      if [ "\${TREETIME_STATUS}" -ne 0 ]; then
+        echo "WARNING: 'treetime clock' failed with exit status \${TREETIME_STATUS} (see the log file in this work directory). Using the built-in clock rate for ${params.genus}." >&2
+        clockrate=\$(default_clockrate)
+        CLOCK=\${clockrate}
+        CLOCKRATE_WARNING="Clock rate estimation failed, treetime clock exited with status \${TREETIME_STATUS}, most likely because the samples are too similar to carry a temporal signal. The built-in rate for ${params.genus} (\${clockrate}) was used instead."
+        run_augur \${clockrate}
+      elif awk "BEGIN {if (\${CORRELATION} < 0.5) exit 0; else exit 1}"; then
         # We have poor fitness of our data we provide treetime with own set of parameters ...
         clockrate=\$(default_clockrate)
         CLOCK=\${clockrate}
+        CLOCKRATE_WARNING="Weak temporal signal, the root-to-tip correlation r^2 = \${CORRELATION} is below 0.5. The built-in rate for ${params.genus} (\${clockrate}) was used instead of the estimated one."
         run_augur \${clockrate}
       else
         # we run treetime without specifying clock rate, alignment is ok
@@ -136,7 +156,8 @@ process add_temporal_data {
         'augur_version':'\${AUGUR_VERSION}',
         'treetime_version' : '\${TREETIME_VERSION}',
         'clockrate_value' : \${CLOCK},
-        'clockrate_correlation' : \${CORRELATION}}
+        'clockrate_correlation' : \${CORRELATION},
+        'clockrate_warning' : '\${CLOCKRATE_WARNING}'}
         }" >> chronogram_data.json
 
     cat chronogram_data.json |  tr "\\'" "\\"" > tmp

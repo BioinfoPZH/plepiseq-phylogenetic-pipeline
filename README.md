@@ -194,7 +194,18 @@ TimeTree cannot estimate a clock rate without variation in sampling dates, so th
 warning and instructs the pipeline to skip the estimation step and use the built-in clock rate for
 the analysed organism (`sars-cov-2`: `1.12e-3`, `influenza`: `2e-5`, `rsv`: `1.12e-3`).
 In that case `clockrate_correlation` in the output JSON is reported as `-1`, exactly as when the rate
-is supplied with `--clockrate`. Pass `--clockrate` to use a different value.
+is supplied with `--clockrate`, and `clockrate_warning` explains which built-in value was used.
+Pass `--clockrate` to use a different value.
+
+### Clock rate estimation failures
+
+`treetime clock` can also fail on datasets that *do* have varying dates but too little genetic
+divergence to support a root-to-tip regression, such as a clonal outbreak. It aborts with
+`LinAlgError: Singular matrix`. The pipeline catches this, falls back to the built-in clock rate for
+the analysed organism and continues; the same fallback applies when the estimated correlation is
+below `0.5`. Whenever a built-in value is substituted, `clockrate_warning` in the output JSON says
+why, and the process log carries a `WARNING:` line pointing at the `treetime` log in the work
+directory.
 ---
 
 -----------------------------------------------------------------
@@ -290,7 +301,18 @@ TimeTree cannot estimate a clock rate without variation in sampling dates, so th
 warning and instructs the pipeline to skip the estimation step and use the built-in clock rate for
 the analysed genus (`Salmonella`: `2e-6`, `Escherichia`: `8e-9`, `Campylobacter`: `6e-6`).
 In that case `clockrate_correlation` in the output JSON is reported as `-1`, exactly as when the rate
-is supplied with `--clockrate`. Pass `--clockrate` to use a different value.
+is supplied with `--clockrate`, and `clockrate_warning` explains which built-in value was used.
+Pass `--clockrate` to use a different value.
+
+### Clock rate estimation failures
+
+`treetime clock` can also fail on datasets that *do* have varying dates but too little genetic
+divergence to support a root-to-tip regression, which is common for a clonal outbreak. It aborts
+with `LinAlgError: Singular matrix`. The pipeline catches this, falls back to the built-in clock
+rate for the analysed genus and continues; the same fallback applies when the estimated correlation
+is below `0.5`. Whenever a built-in value is substituted, `clockrate_warning` in the output JSON
+says why, and the process log carries a `WARNING:` line pointing at the `treetime` log in the work
+directory.
 
 `run_example_salmonella_same_date.sh` and `run_example_influenza_same_date.sh` exercise this path
 using the regular example FASTA files with an alternative metadata file
