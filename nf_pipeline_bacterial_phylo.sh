@@ -43,7 +43,6 @@ metadata=""
 inputDir=""
 inputType=""
 genus="" # analyzed genus only Salmonella Escherichia and Campylobacter are currently supported
-
 # output - localization of output + prefix added to all results
 # as we aggregate multiple files we cannot "guess" it as e.g. we do for NGS pipeline
 results_dir="./results"
@@ -55,13 +54,16 @@ model="GTR+G" # Model for raxml
 starting_trees=10 # Number of random initial trees
 bootstrap=200 # Number of bootstraps
 min_support=70 # Minimum support for a branch to keep it in a tree
-clockrate="" # User can still override any built-in and estimated values fron the alignment. If empty data derived
 threads=36 # ilość wątków używanych maksymalnie przez pipeline
 # QC params
 thresholdN=0.02 # Maksymalny odsetek N w genomie (liczba zmiennoprzecinkowa z przedziału [0, 1])
 thresholdAmbiguous=0 # Maksymalny odsetek symboli niejednoznacznych w genomie (liczba zmiennoprzecinkowa z przedziału [0, 1])
 # Visualization
 map_detail="city"  #  poziom hierarchii na mapie przypisany próbce. Możliwe wartości to country lub city.
+
+# Clockrate estimation
+clockrate="" # User can still override any built-in and estimated values fron the alignment. If empty data derived
+skip_clockrate_estimation="false"
 
 # Usage function to display help
 usage() {
@@ -249,11 +251,11 @@ fi
 [[ "$min_support" =~ ^[0-9]+$ ]]    || err "--min_support must be integer"
 [[ "$starting_trees" =~ ^[0-9]+$ ]] || err "--startingTrees must be integer"
 
-# Validate date column: required format YYYY-MM-DD and, unless --clockrate is
-# explicitly provided, at least two distinct sampling dates. TimeTree's clock-rate
+# Validate date column: required format YYYY-MM-DD. TimeTree's clock-rate
 # estimation (treetime clock) crashes with "No variation in sampling dates!" when
-# every sample shares the same date, before its own fallback logic can kick in, so
-# we catch this before launching Nextflow.
+# every sample shares the same date, before its own fallback logic can kick in.
+# We detect that here and tell the pipeline to skip the estimation step and go
+# straight to the built-in clock rate for the analysed genus.
 date_col=$(get_col_idx "date" "$header")
 if [ -z "$date_col" ]; then
     echo "Błąd: Kolumna 'date' nie znaleziona w metadanych."; exit 1
@@ -275,9 +277,11 @@ if [ -n "$invalid_dates" ]; then
     echo "Błąd: Kolumna 'date' zawiera wartości niezgodne z wymaganym formatem YYYY-MM-DD ($invalid_dates wierszy)."; exit 1
 fi
 
+
 unique_dates=$(awk -v col="$date_col" -F'\t' 'NR>1 {print $col}' "$metadata" | sort | uniq | wc -l)
 if [ "$unique_dates" -lt 2 ] && [ -z "$clockrate" ]; then
-    echo "Błąd: Wszystkie próbki mają identyczną datę pobrania (kolumna 'date'). TimeTree nie jest w stanie oszacować clock rate bez zmienności dat w tej kolumnie - podaj wartość --clockrate lub dodaj próbki z inną datą."; exit 1
+    echo "Uwaga: Wszystkie próbki mają identyczną datę pobrania (kolumna 'date'). TimeTree nie jest w stanie oszacować clock rate bez zmienności dat w tej kolumnie - pomijam estymację i używam wbudowanej wartości domyślnej dla rodzaju '${genus}'. Aby użyć innej wartości, podaj --clockrate."
+    skip_clockrate_estimation="true"
 fi
 
 # 8 Safegurads 
@@ -343,6 +347,7 @@ args=(
   "--map_detail"               "${map_detail}"
   "--db_absolute_path_on_host" "${db_absolute_path_on_host}"
   "--projectDir"               "$projectDir"
+  "--skip_clockrate_estimation" "$skip_clockrate_estimation"
 )
 
 # Append optional clockrate only if set

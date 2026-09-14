@@ -1,0 +1,30 @@
+strain	Serovar	MLST	cgMLST	HC0	HC2	HC5	HC10	HC20	region	country	division	city	date	age	gender
+ERR13711462	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	45	F
+SRR10032843	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	32	M
+SRR10049737	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	N/A	F
+SRR10084868	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	61	M
+SRR10084881	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	29	N/A
+SRR10222053	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	54	F
+SRR10235805	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	38	M
+SRR10236686	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	47	F
+SRR10314911	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	22	M
+SRR10404589	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Olsztyn	2025-04-01	66	F
+SRR14766386	Enteritidis	11	362210	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Krakow	2025-04-01	33	M
+SRR16216494	Enteritidis	11	362181	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Krakow	2025-04-01	58	F
+SRR2096548	Enteritidis	11	362188	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Krakow	2025-04-01	41	M
+SRR22230307	Enteritidis	11	362225	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Rzeszow	2025-04-01	27	F
+SRR23721562	Enteritidis	11	237558	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Bydgoszcz	2025-04-01	50	M
+SRR27592486	Enteritidis	11	365576	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Katowice	2025-04-01	63	F
+SRR28412153	Enteritidis	11	366513	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Szczecin	2025-04-01	36	M
+SRR29209733	Enteritidis	11	365783	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Bialystok	2025-04-01	44	F
+SRR3097404	Enteritidis	11	362223	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Wroclaw	2025-04-01	59	M
+SRR5742498	Enteritidis	11	366533	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Bialystok	2025-04-01	31	F
+SRR5815675	Enteritidis	11	365785	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Katowice	2025-04-01	48	M
+SRR5883584	Enteritidis	11	370254	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Rzeszow	2025-04-01	25	F
+SRR6029164	Enteritidis	11	507437	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Katowice	2025-04-01	55	M
+SRR6107159	Enteritidis	11	507454	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Katowice	2025-04-01	39	F
+SRR6663496	Enteritidis	11	400574	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Katowice	2025-04-01	62	M
+SRR7011956	Enteritidis	11	507560	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Krakow	2025-04-01	30	F
+SRR7890524	Enteritidis	11	507550	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Gorzow Wielkopolski	2025-04-01	43	M
+SRR8207016	Enteritidis	11	507584	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Gorzow Wielkopolski	2025-04-01	52	F
+SRR8782323	Enteritidis	11	507709	Unknown	Unknown	1358	413	Unknown	Europe	Poland	UNK	Kielce	2025-04-01	26	M

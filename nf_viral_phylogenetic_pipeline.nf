@@ -34,6 +34,7 @@ params.starting_trees = "" // Numer of random starting tress
 
 // Timetree parameters
 params.clockrate = "" // User can still override any built-ins and values estimated from the alignment
+params.skip_clockrate_estimation = "false" // Set by the shell wrapper when all samples share one sampling date
 
 // Maximal number of CPUS allocated to a module
 params.threads = ""
@@ -49,34 +50,34 @@ params.input_type = "" // dummy value NOT used by this script
 params.prokka_image = "" // dummy value NOT used by this script
 // Core modules imports
 
-include { augur_index_sequences } from "${modules}/augur_index_sequences.nf"
-include { identify_low_quality_sequences } from "${modules}/identify_low_quality_sequences.nf"
-include { augur_filter_sequences } from "${modules}/augur_filter_sequences.nf"
-include { find_identical_sequences } from "${modules}/find_identical_sequences.nf"
-include { augur_align } from "${modules}/augur_align.nf"
-include { remove_duplicates_from_alignment } from "${modules}/remove_duplicates_from_alignment.nf"
-include { iqtree } from "${modules}/iqtree.nf"
-include { insert_duplicates_into_tree } from "${modules}/insert_duplicates_into_tree.nf"
-include { insert_duplicates_into_alignment } from "${modules}/insert_duplicates_into_alignment.nf"
-include { treetime } from "${modules}/treetime.nf"
-include { augur_export } from "${modules}/augur_export.nf"
-include { rescale_timetree } from "${modules}/rescale_timetree.nf"
-include { prepare_microreact_json } from "${modules}/prepare_microreact_json.nf"
+include { augur_index_sequences } from "${modules}/viruses/augur_index_sequences.nf"
+include { identify_low_quality_sequences } from "${modules}/viruses/identify_low_quality_sequences.nf"
+include { augur_filter_sequences } from "${modules}/viruses/augur_filter_sequences.nf"
+include { find_identical_sequences } from "${modules}/viruses/find_identical_sequences.nf"
+include { augur_align } from "${modules}/viruses/augur_align.nf"
+include { remove_duplicates_from_alignment } from "${modules}/viruses/remove_duplicates_from_alignment.nf"
+include { iqtree } from "${modules}/viruses/iqtree.nf"
+include { insert_duplicates_into_tree } from "${modules}/viruses/insert_duplicates_into_tree.nf"
+include { insert_duplicates_into_alignment } from "${modules}/viruses/insert_duplicates_into_alignment.nf"
+include { treetime } from "${modules}/viruses/treetime.nf"
+include { augur_export } from "${modules}/viruses/augur_export.nf"
+include { rescale_timetree } from "${modules}/viruses/rescale_timetree.nf"
+include { prepare_microreact_json } from "${modules}/common/prepare_microreact_json.nf"
 
 // metadata modules
-include { find_country_coordinates } from "${modules}/find_country_coordinates.nf"
-include { generate_colors_for_features } from "${modules}/generate_colors_for_features.nf"
+include { find_country_coordinates } from "${modules}/viruses/find_country_coordinates.nf"
+include { generate_colors_for_features } from "${modules}/viruses/generate_colors_for_features.nf"
 
 // influenza specific modules
-include { transform_input } from "${modules}/transform_input.nf"
-include { transform_input_novel } from "${modules}/transform_input.nf"
-include { adjust_metadata } from "${modules}/adjust_metadata.nf"
-include { metadata_for_microreact } from "${modules}/metadata_for_microreact.nf"
+include { transform_input } from "${modules}/viruses/transform_input.nf"
+include { transform_input_novel } from "${modules}/viruses/transform_input.nf"
+include { adjust_metadata } from "${modules}/viruses/adjust_metadata.nf"
+include { metadata_for_microreact } from "${modules}/viruses/metadata_for_microreact.nf"
 
 // json_input
-include { create_input_params_json } from "${modules}/create_input_params_json.nf"
-include {merge_jsons} from "${modules}/merge_jsons.nf"
-include {json_aggregator} from "${modules}/json_aggregator.nf"
+include { create_input_params_json } from "${modules}/common/create_input_params_json.nf"
+include {merge_jsons} from "${modules}/viruses/merge_jsons.nf"
+include {json_aggregator} from "${modules}/common/json_aggregator.nf"
 
 
 workflow core {

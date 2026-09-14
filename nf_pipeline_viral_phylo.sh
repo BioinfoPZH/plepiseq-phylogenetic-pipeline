@@ -63,6 +63,7 @@ threads=30 # ilość wątków używanych maksymalnie przez pipeline
 
 # Timetree parameters
 clockrate="" #
+skip_clockrate_estimation="false"
 
 
 # Usage function to display help
@@ -263,11 +264,11 @@ if [ -z "$date_col" ]; then
     echo "Błąd: Kolumna 'date' nie znaleziona w metadanych."; exit 1
 fi
 
-# Validate date column: required format YYYY-MM-DD and, unless --clockrate is
-# explicitly provided, at least two distinct sampling dates. TimeTree's clock-rate
+# Validate date column: required format YYYY-MM-DD. TimeTree's clock-rate
 # estimation (treetime clock) crashes with "No variation in sampling dates!" when
-# every sample shares the same date, before its own fallback logic can kick in, so
-# we catch this before launching Nextflow.
+# every sample shares the same date, before its own fallback logic can kick in.
+# We detect that here and tell the pipeline to skip the estimation step and go
+# straight to the built-in clock rate for the analysed organism.
 invalid_dates=$(awk -v col="$date_col" -F'\t' '
     NR == 1 { next }
     {
@@ -286,7 +287,8 @@ fi
 
 unique_dates=$(awk -v col="$date_col" -F'\t' 'NR>1 {print $col}' "$metadata" | sort | uniq | wc -l)
 if [ "$unique_dates" -lt 2 ] && [ -z "$clockrate" ]; then
-    echo "Błąd: Wszystkie próbki mają identyczną datę pobrania (kolumna 'date'). TimeTree nie jest w stanie oszacować clock rate bez zmienności dat w tej kolumnie - podaj wartość --clockrate lub dodaj próbki z inną datą."; exit 1
+    echo "Uwaga: Wszystkie próbki mają identyczną datę pobrania (kolumna 'date'). TimeTree nie jest w stanie oszacować clock rate bez zmienności dat w tej kolumnie - pomijam estymację i używam wbudowanej wartości domyślnej dla organizmu '${organism}'. Aby użyć innej wartości, podaj --clockrate."
+    skip_clockrate_estimation="true"
 fi
 
 country_col=$(get_col_idx "country" "$header")
@@ -362,6 +364,7 @@ args=(
   "--map_detail"            "$map_detail"
   "--subcategory_organism"  "$unique_type_id"
   "--safeguards_status"     "$safeguards_status"
+  "--skip_clockrate_estimation" "$skip_clockrate_estimation"
 )
 
 # Append optional clockrate only if set

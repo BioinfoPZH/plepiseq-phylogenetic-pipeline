@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] 2026-09-13
+### Added
+- Runs where every sample shares the same sampling date are no longer rejected. 
+- `run_example_salmonella_same_date.sh` and `run_example_influenza_same_date.sh` plus the matching metadata files exercise that path against the existing example FASTA files.
+- `chronogram_data` carries a new `clockrate_warning`
+### Changed
+- Nextflow processes are now organised by pipeline: `modules/bacteria/`, `modules/viruses/` and `modules/common/` for the three processes both pipelines share.
+- The per-genus/per-organism default clock rates are now defined once per process in a `default_clockrate()` helper instead of being repeated across `if`/`elif` branches.
+### Fixed
+- The Campylobacter branch of the bacterial clock-rate fallback was written as `[ ... == 'Campylobacter']` (no space before `]`), so the process aborted instead of applying the default rate.
+- `treetime clock` failing or printing nothing parsable left `CORRELATION`/`CLOCK` empty, which turned the following `awk` comparison into a syntax error and emitted invalid JSON. Both values now fall back to defined defaults.
+- in case of erprs in clockrate estimations the built-in clock rate for the genus/organism is used.
+
 ## [1.3.0] 2026-09-12
 ### Added
 - `WGS2Phylo.py` now passes all columns from a file specified via`--supplemental-file`  (e.g. `age`, `gender`) into `metadata.tsv` as-is, filling empty values with `N/A` and sanitizing values against TSV corruption and spreadsheet formula injection.
